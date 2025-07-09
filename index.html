@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Predicción de Región para Videojuegos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111827;
+      color: white;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    form {
+      background-color: #1f2937;
+      padding: 1.5rem;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 0.5rem;
+    }
+
+    button {
+      background-color: #2563eb;
+      color: white;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+
+    th,
+    td {
+      border: 1px solid #374151;
+      padding: 0.5rem;
+      text-align: left;
+    }
+
+    th {
+      background-color: #374151;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 2rem;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Predicción de Región para Videojuegos</h1>
+
+    <form id="formVideojuego">
+      <label for="name">Nombre del juego:</label>
+      <input type="text" id="name" required />
+
+      <label for="publisher">Publisher:</label>
+      <select id="publisher" required>
+        <option value="Electronic Arts">Electronic Arts</option>
+        <option value="Activision">Activision</option>
+        <option value="Namco Bandai Games">Namco Bandai Games</option>
+        <option value="Ubisoft">Ubisoft</option>
+        <option value="Konami Digital Entertainment">Konami Digital Entertainment</option>
+        <option value="THQ">THQ</option>
+        <option value="Sega">Sega</option>
+        <option value="Nintendo">Nintendo</option>
+        <option value="Sony Computer Entertainment">Sony Computer Entertainment</option>
+        <option value="Take-Two Interactive">Take-Two Interactive</option>
+        <option value="Tecmo Koei">Tecmo Koei</option>
+        <option value="Capcom">Capcom</option>
+        <option value="Square Enix">Square Enix</option>
+        <option value="Warner Bros. Interactive Entertainment">Warner Bros. Interactive Entertainment</option>
+        <option value="Disney Interactive Studios">Disney Interactive Studios</option>
+      </select>
+
+
+      <label for="plataforma">Plataforma:</label>
+      <select id="plataforma" required>
+        <option value="Wii">Wii</option>
+        <option value="NES">NES</option>
+        <option value="SNES">SNES</option>
+        <option value="N64">N64</option>
+        <option value="GC">GameCube</option>
+        <option value="GB">Game Boy</option>
+        <option value="GBA">Game Boy Advance</option>
+        <option value="DS">Nintendo DS</option>
+        <option value="3DS">Nintendo 3DS</option>
+        <option value="WiiU">Wii U</option>
+
+        <option value="PS">PlayStation</option>
+        <option value="PS2">PlayStation 2</option>
+        <option value="PS3">PlayStation 3</option>
+        <option value="PS4">PlayStation 4</option>
+        <option value="PSP">PSP</option>
+        <option value="PSV">PS Vita</option>
+
+        <option value="X360">Xbox 360</option>
+        <option value="XB">Xbox</option>
+        <option value="XOne">Xbox One</option>
+
+        <option value="PC">PC</option>
+      </select>
+
+      <label for="genero">Género:</label>
+      <select id="genero" required>
+        <option value="Action">Action</option>
+        <option value="Misc">Misc</option>
+        <option value="Sports">Sports</option>
+        <option value="Shooter">Shooter</option>
+        <option value="Racing">Racing</option>
+        <option value="Adventure">Adventure</option>
+        <option value="Platform">Platform</option>
+        <option value="Fighting">Fighting</option>
+        <option value="Puzzle">Puzzle</option>
+        <option value="Simulation">Simulation</option>
+        <option value="Strategy">Strategy</option>
+        <option value="Role-Playing">Role-Playing</option>
+      </select>
+
+      <label for="company">Compañía:</label>
+      <select id="company" required>
+        <option value="Nintendo">Nintendo</option>
+        <option value="Sony">Sony</option>
+        <option value="Microsoft">Microsoft</option>
+        <option value="PC">PC</option>
+      </select>
+
+      <button type="submit">Predecir Región</button>
+    </form>
+
+    <div id="tablaContainer"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("formVideojuego");
+    const tablaContainer = document.getElementById("tablaContainer");
+    const videojuegos = [];
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const publisher = document.getElementById("publisher").value;
+      const plataforma = document.getElementById("plataforma").value;
+      const genero = document.getElementById("genero").value;
+      const company = document.getElementById("company").value;
+
+      if (name && publisher && plataforma && genero && company) {
+        try {
+          const respuesta = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              Platform: plataforma,
+              Genre: genero,
+              Publisher: publisher,
+              Company: company
+            }),
+          });
+
+          const data = await respuesta.json();
+          console.log("Respuesta:", data);
+
+          const region = data.region_predicha || data.message || "No determinada";
+
+          videojuegos.push({
+            name,
+            publisher,
+            plataforma,
+            genero,
+            company,
+            region,
+          });
+
+          form.reset();
+          renderTabla();
+
+        } catch (err) {
+          alert("Error al predecir la región: " + err);
+        }
+      }
+    });
+
+    function renderTabla() {
+      if (videojuegos.length === 0) {
+        tablaContainer.innerHTML =
+          '<p class="message">Aún no se han registrado videojuegos.</p>';
+        return;
+      }
+
+      let tablaHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Publisher</th>
+              <th>Plataforma</th>
+              <th>Género</th>
+              <th>Compañía</th>
+              <th>Región Sugerida</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      videojuegos.forEach((v) => {
+        tablaHTML += `
+          <tr>
+            <td>${v.name}</td>
+            <td>${v.publisher}</td>
+            <td>${v.plataforma}</td>
+            <td>${v.genero}</td>
+            <td>${v.company}</td>
+            <td>${v.region}</td>
+          </tr>
+        `;
+      });
+
+      tablaHTML += `</tbody></table>`;
+      tablaContainer.innerHTML = tablaHTML;
+    }
+
+    renderTabla();
+  </script>
+</body>
+
+</html>
